@@ -1,0 +1,44 @@
+{
+    "name": "uskur/omnipay-pelecard",
+    "description": "Pelecard support for Omnipay payment processing library",
+    "keywords": [
+        "omnipay",
+        "pelecard"
+    ],
+    "homepage": "https://github.com/uskur/omnipay-pelecard",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Burak USGURLU",
+            "email": "burak@uskur.com.tr",
+            "homepage": "https://www.uskur.com.tr",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.3.0",
+        "omnipay/common": "~2.0"
+    },
+    "require-dev": {
+        "omnipay/tests": "~2.0",
+        "scrutinizer/ocular": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Omnipay\\Skeleton\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "League\\Skeleton\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
