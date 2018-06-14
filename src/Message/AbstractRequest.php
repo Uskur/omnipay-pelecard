@@ -13,8 +13,6 @@ abstract class AbstractRequest extends BaseAbstractRequest
 
     protected $liveEndpoint = 'https://gateway20.pelecard.biz/PaymentGW/init';
 
-    protected $testEndpoint = 'https://gateway20.pelecard.biz/PaymentGW/init';
-
     protected $request = [];
 
     /**
@@ -25,10 +23,17 @@ abstract class AbstractRequest extends BaseAbstractRequest
     public function getData()
     {
         $this->request = array();
-        $this->request['user'] = $this->getParameter('user');
-        $this->request['password'] = $this->getParameter('password');
-        $this->request['terminal'] = $this->getParameter('terminal');
-        $this->request['Language'] = $this->getParameter('Language');
+        if($this->getTestMode()){
+            $this->request['user'] = 'testpelecard3';
+            $this->request['password'] = 'Q3EJB8Ah';
+            $this->request['terminal'] = '0962210';
+        }
+        else{
+            $this->request['user'] = $this->getParameter('user');
+            $this->request['password'] = $this->getParameter('password');
+            $this->request['terminal'] = $this->getParameter('terminal');
+        }
+        
         
         return $this->request;
     }
@@ -145,25 +150,9 @@ abstract class AbstractRequest extends BaseAbstractRequest
         throw new RuntimeException('Unknown currency');
     }
 
-    /**
-     * Sets the language code.
-     *
-     * @param string $value
-     */
-    public function setLanguage($value)
-    {
-        if ($value !== null) {
-            $value = strtoupper($value);
-        }
-        if(!in_array($value, ['HE','EN','RU'])) {
-            throw new RuntimeException('Unknown language');
-        }
-        return $this->setParameter('Language', $value);
-    }
-
     protected function getEndpoint()
     {
-        return $this->getTestMode() ? $this->testEndpoint : $this->liveEndpoint;
+        return $this->liveEndpoint;
     }
 
     protected function createResponse($data)

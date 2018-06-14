@@ -32,6 +32,10 @@ The following gateways are provided by this package:
 
 For general usage instructions, please see the main [Omnipay](https://github.com/thephpleague/omnipay) repository.
 
+There isn't a seperate test gateway but there are test users. Enabling test mode sets the user to a test user.
+
+The outcome of a result can be changed by using the QAResultStatus parameter. Set to '000' to get a positive result. 
+
 ## Support
 
 If you are having general issues with Omnipay, we suggest posting on

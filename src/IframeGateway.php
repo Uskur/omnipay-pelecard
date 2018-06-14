@@ -11,9 +11,9 @@ class IframeGateway extends AbstractGateway
 
     public function getName()
     {
-        return 'Iframe';
+        return 'Pelecard Iframe Gateway';
     }
-
+    
     public function getDefaultParameters()
     {
         return array(
@@ -102,6 +102,21 @@ class IframeGateway extends AbstractGateway
      */
     public function authorize(array $parameters = array())
     {
-        return $this->createRequest('\Omnipay\Pelecard\Message\InitializeRequest', $parameters);
+        return $this->createRequest('\Omnipay\Pelecard\Message\AuthorizeRequest', $parameters);
+    }
+    
+    public function status(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Pelecard\Message\StatusRequest', $parameters);
+    }
+
+    public function acceptNotification(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Pelecard\Message\StatusRequest', $parameters);
+    }
+    
+    public function extendedStatus(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Pelecard\Message\StatusRequest', $parameters);
     }
 }
