@@ -1,5 +1,5 @@
 <?php
-namespace Omnipay\Skeleton\Message;
+namespace Omnipay\Pelecard\Message;
 /**
  * Authorize Request
  *

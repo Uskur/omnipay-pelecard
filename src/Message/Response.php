@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\Skeleton\Message;
+namespace Omnipay\Pelecard\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RequestInterface;
@@ -18,14 +18,34 @@ class Response extends AbstractResponse
 
     public function isSuccessful()
     {
-        return isset($this->data['success']);
+        return $this->data['Error']['ErrCode'] == 0;
     }
 
     public function getTransactionReference()
     {
-        if (isset($this->data['reference'])) {
-            return $this->data['reference'];
+        if (isset($this->data['ConfirmationKey'])) {
+            return $this->data['ConfirmationKey'];
         }
+    }
+    
+    public function getRedirectUrl()
+    {
+        if (isset($this->data['URL'])) {
+            return $this->data['URL'];
+        }
+    }
+    
+    public function isRedirect()
+    {
+        if (isset($this->data['URL']) && !empty($this->data['URL'])) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function getMessage()
+    {
+        return $this->data['Error']['ErrMsg'];
     }
 
 }
