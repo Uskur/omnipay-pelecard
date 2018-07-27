@@ -14,7 +14,7 @@ class AuthorizeRequest extends AbstractRequest
         $data = parent::getData();
         $data['UserKey'] = $this->getTransactionId();
         $data['Total'] = $this->getAmountInteger();
-        $data['Currency'] = $this->getCurrency();
+        $data['Currency'] = $this->getCurrencyCode();
         $data['GoodURL'] = $this->getReturnUrl();
         $data['ErrorURL'] = $this->getReturnUrl();
         $data['CancelURL'] = $this->getCancelUrl();

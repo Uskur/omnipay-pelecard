@@ -3,8 +3,8 @@ namespace Omnipay\Pelecard\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RequestInterface;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Client as HttpClient;
+use Omnipay\Common\Http\ClientInterface;
+use Omnipay\Common\Http\Client as HttpClient;
 
 /**
  * Response
@@ -29,18 +29,16 @@ class Response extends AbstractResponse
                 "UniqueKey" => $this->request->getTransactionId()?$this->request->getTransactionId():$this->data['ResultData']['TransactionId'],
                 "TotalX100" => $this->data['ResultData']['DebitTotal']
             ];
-            $httpClient = new HttpClient('', array(
-                'curl.options' => array(
-                    CURLOPT_CONNECTTIMEOUT => 60
-                )
-            ));
-            $httpRequest = $httpClient->post($url, [
-                'Content-Type' => 'application/json; charset=utf-8',
+            
+            
+            $httpClient = new HttpClient();
+
+            $httpResponse = $httpClient->request('POST', $url, [
                 'Accept' => 'application/json',
+                'Content-Type' => 'application/json; charset=utf-8',
                 'json' => json_encode($request)
             ], json_encode($request));
-            $httpResponse = $httpRequest->send();
-            return $httpResponse->json() == 1;
+            return $httpResponse->getBody()->getContents() == 1;
         } else
             return false;
     }

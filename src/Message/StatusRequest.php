@@ -13,7 +13,6 @@ class StatusRequest extends AbstractRequest
     public function getData()
     {
         $data = parent::getData();
-        $data['QAResultStatus']='000';
         $data['TransactionId'] = $this->getTransactionReference();
         return $data;
     }

@@ -121,32 +121,35 @@ abstract class AbstractRequest extends BaseAbstractRequest
 
     public function sendData($data)
     {
-        $httpRequest = $this->httpClient->post($this->getEndpoint(), [
-            'Content-Type' => 'application/json; charset=utf-8',
+        $response = $this->httpClient->request('POST', $this->getEndpoint(), [
             'Accept' => 'application/json',
+            'Content-Type' => 'application/json; charset=utf-8',
             'json' => json_encode($data)
         ], json_encode($data));
-        $httpResponse = $httpRequest->send();
-        return $this->createResponse($httpResponse->json());
+        
+        $result = json_decode($response->getBody()->getContents(), true);
+
+        return $this->createResponse($result);
     }
 
     /**
-     * Sets the payment currency code.
+     * Gets the payment currency code.
      *
      * @param string $value
      * @return AbstractRequest Provides a fluent interface
      */
-    public function setCurrency($value)
+    public function getCurrencyCode()
     {
+        $value = $this->getParameter('currency');
         if ($value !== null) {
             $value = strtoupper($value);
         }
         if ($value == 'NIS')
-            return $this->setParameter('currency', 1);
+            return 1;
         if ($value == 'USD')
-            return $this->setParameter('currency', 2);
+            return 2;
         if ($value == 'EUR')
-            return $this->setParameter('currency', 978);
+            return 978;
         throw new RuntimeException('Unknown currency');
     }
 
