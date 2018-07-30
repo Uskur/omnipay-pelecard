@@ -105,6 +105,11 @@ class IframeGateway extends AbstractGateway
         return $this->createRequest('\Omnipay\Pelecard\Message\AuthorizeRequest', $parameters);
     }
     
+    public function purchase(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Pelecard\Message\AuthorizeRequest', $parameters);
+    }
+    
     public function status(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Pelecard\Message\StatusRequest', $parameters);
