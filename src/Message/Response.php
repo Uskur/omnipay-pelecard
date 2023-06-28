@@ -29,8 +29,8 @@ class Response extends AbstractResponse
                 "UniqueKey" => $this->request->getTransactionId()?$this->request->getTransactionId():$this->data['ResultData']['TransactionId'],
                 "TotalX100" => $this->data['ResultData']['DebitTotal']
             ];
-            
-            
+
+
             $httpClient = new HttpClient();
 
             $httpResponse = $httpClient->request('POST', $url, [
@@ -58,6 +58,9 @@ class Response extends AbstractResponse
 
     public function getTransactionReference()
     {
+        if(isset($this->data['ResultData']['TransactionId'])) {
+            return $this->data['ResultData']['TransactionId'];
+        }
         if (isset($this->data['URL']) && ! empty($this->data['URL'])) {
             $url = parse_url($this->data['URL']);
             if (! empty($url['query'])) {
