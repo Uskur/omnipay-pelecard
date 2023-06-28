@@ -144,7 +144,7 @@ abstract class AbstractRequest extends BaseAbstractRequest
         if ($value !== null) {
             $value = strtoupper($value);
         }
-        if ($value == 'NIS')
+        if ($value == 'NIS' || $value == 'ILS')
             return 1;
         if ($value == 'USD')
             return 2;
