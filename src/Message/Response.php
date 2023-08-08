@@ -58,7 +58,7 @@ class Response extends AbstractResponse
 
     public function getTransactionReference()
     {
-        if(isset($this->data['ResultData']['TransactionId'])) {
+        if (isset($this->data['ResultData']['TransactionId']) && ! empty($this->data['ResultData']['TransactionId'])) {
             return $this->data['ResultData']['TransactionId'];
         }
         if (isset($this->data['URL']) && ! empty($this->data['URL'])) {
