@@ -1,5 +1,8 @@
 <?php
 namespace Omnipay\Pelecard\Message;
+
+use Omnipay\Common\Exception\InvalidRequestException;
+use RuntimeException;
 /**
  * Authorize Request
  *
@@ -24,8 +27,12 @@ class AuthorizeRequest extends AbstractRequest
         $data['CustomerIndexField'] = $this->getCard()->getPostcode();
         $data['CustomerCountryField'] = $this->getCard()->getCountry();
         $data['EmailField'] = $this->getCard()->getEmail();
-        if($this->getParameter('Language')) $data['Language'] = $this->getParameter('Language');
-        if($this->getParameter('QAResultStatus')) $data['QAResultStatus'] = $this->getParameter('QAResultStatus');
+        if ($this->getParameter('Language')) {
+            $data['Language'] = $this->getParameter('Language');
+        }
+        if ($this->getParameter('QAResultStatus')) {
+            $data['QAResultStatus'] = $this->getParameter('QAResultStatus');
+        }
         return $data;
     }
     
@@ -62,7 +69,7 @@ class AuthorizeRequest extends AbstractRequest
         if ($value !== null) {
             $value = strtoupper($value);
         }
-        if(!in_array($value, ['HE','EN','RU'])) {
+        if (!in_array($value, ['HE', 'EN', 'RU'], true)) {
             throw new RuntimeException('Unknown language');
         }
         return $this->setParameter('Language', $value);

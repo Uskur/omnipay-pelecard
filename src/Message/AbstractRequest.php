@@ -22,19 +22,17 @@ abstract class AbstractRequest extends BaseAbstractRequest
      */
     public function getData()
     {
-        $this->request = array();
-        if($this->getTestMode()){
+        $this->request = [];
+        if ($this->getTestMode()) {
             $this->request['user'] = 'testpelecard3';
             $this->request['password'] = 'Q3EJB8Ah';
             $this->request['terminal'] = '0962210';
-        }
-        else{
+        } else {
             $this->request['user'] = $this->getParameter('user');
             $this->request['password'] = $this->getParameter('password');
             $this->request['terminal'] = $this->getParameter('terminal');
         }
-        
-        
+
         return $this->request;
     }
 
@@ -121,13 +119,22 @@ abstract class AbstractRequest extends BaseAbstractRequest
 
     public function sendData($data)
     {
-        $httpRequest = $this->httpClient->post($this->getEndpoint(), [
+        return $this->createResponse($this->sendJsonRequest($this->getEndpoint(), $data));
+    }
+
+    public function sendJsonRequest($url, array $data)
+    {
+        $httpResponse = $this->httpClient->request('POST', $url, [
             'Content-Type' => 'application/json; charset=utf-8',
             'Accept' => 'application/json',
-            'json' => json_encode($data)
         ], json_encode($data));
-        $httpResponse = $httpRequest->send();
-        return $this->createResponse($httpResponse->json());
+
+        $decoded = json_decode((string)$httpResponse->getBody(), true);
+        if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException('Invalid JSON response from Pelecard.');
+        }
+
+        return $decoded;
     }
 
     /**
@@ -141,12 +148,15 @@ abstract class AbstractRequest extends BaseAbstractRequest
         if ($value !== null) {
             $value = strtoupper($value);
         }
-        if ($value == 'NIS')
+        if ($value == 'NIS') {
             return $this->setParameter('currency', 1);
-        if ($value == 'USD')
+        }
+        if ($value == 'USD') {
             return $this->setParameter('currency', 2);
-        if ($value == 'EUR')
+        }
+        if ($value == 'EUR') {
             return $this->setParameter('currency', 978);
+        }
         throw new RuntimeException('Unknown currency');
     }
 

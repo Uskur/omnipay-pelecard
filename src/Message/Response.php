@@ -3,8 +3,7 @@ namespace Omnipay\Pelecard\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RequestInterface;
-use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Client as HttpClient;
+use RuntimeException;
 
 /**
  * Response
@@ -26,23 +25,17 @@ class Response extends AbstractResponse
             //The parameter name in the confirmation JSON is UniqueKey because in case there is no UserKey (was not sent in the initial JSON) you can perform confirmation using TransactionId instead.
             $request = [
                 "ConfirmationKey" => $this->data['ResultData']['ConfirmationKey'],
-                "UniqueKey" => $this->request->getTransactionId()?$this->request->getTransactionId():$this->data['ResultData']['TransactionId'],
+                "UniqueKey" => $this->request->getTransactionId() ? $this->request->getTransactionId() : $this->data['ResultData']['TransactionId'],
                 "TotalX100" => $this->data['ResultData']['DebitTotal']
             ];
-            $httpClient = new HttpClient('', array(
-                'curl.options' => array(
-                    CURLOPT_CONNECTTIMEOUT => 60
-                )
-            ));
-            $httpRequest = $httpClient->post($url, [
-                'Content-Type' => 'application/json; charset=utf-8',
-                'Accept' => 'application/json',
-                'json' => json_encode($request)
-            ], json_encode($request));
-            $httpResponse = $httpRequest->send();
-            return $httpResponse->json() == 1;
-        } else
-            return false;
+            if (!method_exists($this->request, 'sendJsonRequest')) {
+                throw new RuntimeException('Pelecard request object does not support JSON requests.');
+            }
+
+            return $this->request->sendJsonRequest($url, $request) == 1;
+        }
+
+        return false;
     }
 
     public function isCancelled()
