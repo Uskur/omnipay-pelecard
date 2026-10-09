@@ -53,6 +53,15 @@ class Response extends AbstractResponse
 
     public function getTransactionReference()
     {
+        if (!empty($this->data['ResultData']['TransactionId'])) {
+            return $this->data['ResultData']['TransactionId'];
+        }
+        if (!empty($this->data['PelecardTransactionId'])) {
+            return $this->data['PelecardTransactionId'];
+        }
+        if (!empty($this->data['TransactionId'])) {
+            return $this->data['TransactionId'];
+        }
         if (isset($this->data['URL']) && ! empty($this->data['URL'])) {
             $url = parse_url($this->data['URL']);
             if (! empty($url['query'])) {
@@ -61,6 +70,9 @@ class Response extends AbstractResponse
                     return $query['transactionId'];
                 }
             }
+        }
+        if (!empty($this->request->getTransactionReference())) {
+            return $this->request->getTransactionReference();
         }
         throw new \Exception('Unable to parse query to extract transaction reference.');
     }
@@ -82,6 +94,6 @@ class Response extends AbstractResponse
 
     public function getMessage()
     {
-        return $this->data['Error']['ErrMsg'];
+        return $this->data['Error']['ErrMsg'] ?? null;
     }
 }

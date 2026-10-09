@@ -4,37 +4,97 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/uskur/omnipay-pelecard.svg?style=flat-square)](https://packagist.org/packages/uskur/omnipay-pelecard)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/uskur/omnipay-pelecard/master.svg?style=flat-square)](https://travis-ci.org/uskur/omnipay-pelecard)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/uskur/omnipay-pelecard.svg?style=flat-square)](https://scrutinizer-ci.com/g/uskur/omnipay-pelecard/code-structure)
-[![Quality Score](https://img.shields.io/scrutinizer/g/uskur/omnipay-pelecard.svg?style=flat-square)](https://scrutinizer-ci.com/g/uskur/omnipay-pelecard)
+[![Tests](https://github.com/uskur/omnipay-pelecard/actions/workflows/tests.yml/badge.svg)](https://github.com/uskur/omnipay-pelecard/actions/workflows/tests.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/uskur/omnipay-pelecard.svg?style=flat-square)](https://packagist.org/packages/uskur/omnipay-pelecard)
 
 
-[Omnipay](https://github.com/thephpleague/omnipay) is a framework agnostic, multi-gateway payment
-processing library for PHP 5.3+. This package implements pelecard support for Omnipay.
+[Omnipay](https://github.com/thephpleague/omnipay) is a framework-agnostic,
+multi-gateway payment processing library. This package provides Pelecard's
+hosted iframe payment flow for Omnipay 3 on PHP 8.1 and later.
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+## Version compatibility
+
+| Package | PHP | Omnipay |
+| --- | --- | --- |
+| `2.x` | `^8.1` | `^3.0` |
+| `1.x` | `>=5.3` | `~2.0` |
 
 ## Install
 
 Via Composer
 
-``` bash
-$ composer require uskur/omnipay-pelecard
+```bash
+composer require uskur/omnipay-pelecard
 ```
 
 ## Usage
 
-The following gateways are provided by this package:
+The package provides the `Pelecard_Iframe` gateway. Pelecard's iframe flow
+authorizes and captures in one operation, so both `purchase()` and
+`authorize()` create the same hosted payment request.
 
- * pelecard
+```php
+use Omnipay\Omnipay;
 
-For general usage instructions, please see the main [Omnipay](https://github.com/thephpleague/omnipay) repository.
+$gateway = Omnipay::create('Pelecard_Iframe');
+$gateway->setUser(getenv('PELECARD_USER'));
+$gateway->setPassword(getenv('PELECARD_PASSWORD'));
+$gateway->setTerminal(getenv('PELECARD_TERMINAL'));
 
-There isn't a seperate test gateway but there are test users. Enabling test mode sets the user to a test user.
+$response = $gateway->purchase([
+    'transactionId' => 'order-123',
+    'amount' => '100.00',
+    'currency' => 'ILS',
+    'card' => $card,
+    'returnUrl' => 'https://merchant.example/payments/return',
+    'cancelUrl' => 'https://merchant.example/payments/cancel',
+])->send();
 
-The outcome of a result can be changed by using the QAResultStatus parameter. Set to '000' to get a positive result. 
+if ($response->isRedirect()) {
+    $response->redirect();
+}
+```
+
+Supported currencies are `ILS`, `USD`, and `EUR`. The legacy `NIS` alias is
+accepted and normalized to `ILS`.
+
+### Test mode
+
+Pelecard uses the production API endpoints with credentials assigned for
+testing. Supply those credentials explicitly; the package does not contain
+shared or hard-coded test credentials.
+
+```php
+$gateway->setTestMode(true);
+$gateway->setTestUser(getenv('PELECARD_TEST_USER'));
+$gateway->setTestPassword(getenv('PELECARD_TEST_PASSWORD'));
+$gateway->setTestTerminal(getenv('PELECARD_TEST_TERMINAL'));
+```
+
+Keep credentials in environment variables or a secret manager. Do not commit
+them to the repository.
+
+For Pelecard QA accounts, `QAResultStatus` can be passed on an individual
+payment request when a specific simulated outcome is needed. Status requests
+report Pelecard's actual result and do not override it.
+
+### Status and callbacks
+
+Use the transaction reference returned by the initialization response when
+requesting status:
+
+```php
+$status = $gateway->status([
+    'transactionReference' => $transactionReference,
+])->send();
+```
+
+Transaction references are recognized in Pelecard result data, callback
+parameters (`PelecardTransactionId` or `TransactionId`), hosted-payment URLs,
+and the originating request as a final fallback.
+
+For general usage instructions, see the main
+[Omnipay](https://github.com/thephpleague/omnipay) repository.
 
 ## Support
 
@@ -55,8 +115,8 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 ## Testing
 
-``` bash
-$ composer test
+```bash
+composer test
 ```
 
 ## Contributing

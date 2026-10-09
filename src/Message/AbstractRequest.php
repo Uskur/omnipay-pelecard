@@ -24,10 +24,12 @@ abstract class AbstractRequest extends BaseAbstractRequest
     {
         $this->request = [];
         if ($this->getTestMode()) {
-            $this->request['user'] = 'testpelecard3';
-            $this->request['password'] = 'Q3EJB8Ah';
-            $this->request['terminal'] = '0962210';
+            $this->validate('testUser', 'testPassword', 'testTerminal');
+            $this->request['user'] = $this->getParameter('testUser');
+            $this->request['password'] = $this->getParameter('testPassword');
+            $this->request['terminal'] = $this->getParameter('testTerminal');
         } else {
+            $this->validate('user', 'password', 'terminal');
             $this->request['user'] = $this->getParameter('user');
             $this->request['password'] = $this->getParameter('password');
             $this->request['terminal'] = $this->getParameter('terminal');
@@ -117,6 +119,36 @@ abstract class AbstractRequest extends BaseAbstractRequest
         return $this->setParameter('terminal', $value);
     }
 
+    public function getTestUser()
+    {
+        return $this->getParameter('testUser');
+    }
+
+    public function setTestUser($value)
+    {
+        return $this->setParameter('testUser', $value);
+    }
+
+    public function getTestPassword()
+    {
+        return $this->getParameter('testPassword');
+    }
+
+    public function setTestPassword($value)
+    {
+        return $this->setParameter('testPassword', $value);
+    }
+
+    public function getTestTerminal()
+    {
+        return $this->getParameter('testTerminal');
+    }
+
+    public function setTestTerminal($value)
+    {
+        return $this->setParameter('testTerminal', $value);
+    }
+
     public function sendData($data)
     {
         return $this->createResponse($this->sendJsonRequest($this->getEndpoint(), $data));
@@ -138,26 +170,39 @@ abstract class AbstractRequest extends BaseAbstractRequest
     }
 
     /**
-     * Sets the payment currency code.
+     * Get Pelecard's numeric code for the payment currency.
      *
-     * @param string $value
-     * @return AbstractRequest Provides a fluent interface
+     * @return int
+     */
+    public function getCurrencyCode()
+    {
+        $value = strtoupper((string)$this->getCurrency());
+
+        if ($value === 'NIS' || $value === 'ILS') {
+            return 1;
+        }
+        if ($value === 'USD') {
+            return 2;
+        }
+        if ($value === 'EUR') {
+            return 978;
+        }
+        throw new RuntimeException(sprintf('Unknown currency: %s', $value));
+    }
+
+    /**
+     * Set the ISO payment currency, normalizing Pelecard's legacy NIS alias.
+     *
+     * @param string $value Currency code.
+     * @return AbstractRequest
      */
     public function setCurrency($value)
     {
-        if ($value !== null) {
-            $value = strtoupper($value);
+        if (strtoupper((string)$value) === 'NIS') {
+            $value = 'ILS';
         }
-        if ($value == 'NIS') {
-            return $this->setParameter('currency', 1);
-        }
-        if ($value == 'USD') {
-            return $this->setParameter('currency', 2);
-        }
-        if ($value == 'EUR') {
-            return $this->setParameter('currency', 978);
-        }
-        throw new RuntimeException('Unknown currency');
+
+        return parent::setCurrency($value);
     }
 
     protected function getEndpoint()

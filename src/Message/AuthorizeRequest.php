@@ -17,7 +17,7 @@ class AuthorizeRequest extends AbstractRequest
         $data = parent::getData();
         $data['UserKey'] = $this->getTransactionId();
         $data['Total'] = $this->getAmountInteger();
-        $data['Currency'] = $this->getCurrency();
+        $data['Currency'] = $this->getCurrencyCode();
         $data['GoodURL'] = $this->getReturnUrl();
         $data['ErrorURL'] = $this->getReturnUrl();
         $data['CancelURL'] = $this->getCancelUrl();
@@ -35,7 +35,7 @@ class AuthorizeRequest extends AbstractRequest
         }
         return $data;
     }
-    
+
     /**
      * Get GoodURL
      *
@@ -48,7 +48,7 @@ class AuthorizeRequest extends AbstractRequest
         }
         return $this->getParameter('returnUrl');
     }
-    
+
     /**
      * Set GoodURL
      *
@@ -58,7 +58,7 @@ class AuthorizeRequest extends AbstractRequest
     {
         return $this->setParameter('returnUrl', $value);
     }
-    
+
     /**
      * Sets the language code.
      *
@@ -73,5 +73,26 @@ class AuthorizeRequest extends AbstractRequest
             throw new RuntimeException('Unknown language');
         }
         return $this->setParameter('Language', $value);
+    }
+
+    /**
+     * Get the Pelecard QA result status requested for this payment.
+     *
+     * @return string|null
+     */
+    public function getQAResultStatus()
+    {
+        return $this->getParameter('QAResultStatus');
+    }
+
+    /**
+     * Set the Pelecard QA result status for this payment.
+     *
+     * @param string|null $value Pelecard status code.
+     * @return AuthorizeRequest
+     */
+    public function setQAResultStatus($value)
+    {
+        return $this->setParameter('QAResultStatus', $value);
     }
 }

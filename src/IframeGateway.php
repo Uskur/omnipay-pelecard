@@ -20,6 +20,9 @@ class IframeGateway extends AbstractGateway
             'user' => '',
             'password' => '',
             'terminal' => '',
+            'testUser' => '',
+            'testPassword' => '',
+            'testTerminal' => '',
             'testMode' => false
         );
     }
@@ -96,11 +99,54 @@ class IframeGateway extends AbstractGateway
         return $this->setParameter('terminal', $value);
     }
 
+    public function getTestUser()
+    {
+        return $this->getParameter('testUser');
+    }
+
+    public function setTestUser($value)
+    {
+        return $this->setParameter('testUser', $value);
+    }
+
+    public function getTestPassword()
+    {
+        return $this->getParameter('testPassword');
+    }
+
+    public function setTestPassword($value)
+    {
+        return $this->setParameter('testPassword', $value);
+    }
+
+    public function getTestTerminal()
+    {
+        return $this->getParameter('testTerminal');
+    }
+
+    public function setTestTerminal($value)
+    {
+        return $this->setParameter('testTerminal', $value);
+    }
+
     /**
      *
      * @return Message\AuthorizeRequest
      */
     public function authorize(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Pelecard\Message\AuthorizeRequest', $parameters);
+    }
+
+    /**
+     * Create a purchase request.
+     *
+     * Pelecard's iframe flow authorizes and captures the payment in a single
+     * request, so purchases use the same request implementation.
+     *
+     * @return Message\AuthorizeRequest
+     */
+    public function purchase(array $parameters = array())
     {
         return $this->createRequest('\Omnipay\Pelecard\Message\AuthorizeRequest', $parameters);
     }
